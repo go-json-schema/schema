@@ -236,11 +236,7 @@ func GenerateDraft04() error {
 	}
 	fmt.Fprintf(&buf, "\n}") // end type SchemaProperties
 
-	for _, prop := range schemaProperties {
-		fmt.Fprintf(&buf, "\n\nfunc(s *Schema) %s() %s {", prop.Name, prop.Type)
-		fmt.Fprintf(&buf, "\nreturn s.properties.%s", prop.Name)
-		fmt.Fprintf(&buf, "\n}") // end getter
-	}
+	WriteGetters(&buf, "draft04", schemaProperties)
 
 	fmt.Fprintf(&buf, "\n\nfunc (s *Schema) MarshalJSON() ([]byte, error) {")
 	fmt.Fprintf(&buf, "\nreturn json.Marshal(s.properties)")
@@ -508,11 +504,7 @@ func GenerateDraft07() error {
 	}
 	fmt.Fprintf(&buf, "\n}") // end type SchemaProperties
 
-	for _, prop := range schemaProperties {
-		fmt.Fprintf(&buf, "\n\nfunc(s *Schema) %s() %s {", prop.Name, prop.Type)
-		fmt.Fprintf(&buf, "\nreturn s.properties.%s", prop.Name)
-		fmt.Fprintf(&buf, "\n}") // end getter
-	}
+	WriteGetters(&buf, "draft07", schemaProperties)
 
 	for _, prop := range schemaProperties {
 		if strings.HasPrefix(prop.Type, `[]`) {
@@ -643,4 +635,20 @@ func (s *SchemaList) UnmarshalJSON(buf []byte) error {
 	s.store = []*Schema{&v}
 	return nil
 }`)
+}
+
+func WriteGetters(dst io.Writer, namespace string, properties []Property) {
+	for _, prop := range properties {
+		fmt.Fprintf(dst, "\n\nfunc(s *Schema) %s() %s {", prop.Name, prop.Type)
+		// SchemaRef is an exception
+		if prop.Name != "SchemaRef" {
+			fmt.Fprintf(dst, "\nreturn s.properties.%s", prop.Name)
+		} else {
+			fmt.Fprintf(dst, "\nif v := s.properties.%s; v != \"\" {", prop.Name)
+			fmt.Fprintf(dst, "\nreturn v")
+			fmt.Fprintf(dst, "\n}") // end of if v := s.properties.%s
+			fmt.Fprintf(dst, "\nreturn %s.SchemaID", namespace)
+		}
+		fmt.Fprintf(dst, "\n}") // end getter
+	}
 }

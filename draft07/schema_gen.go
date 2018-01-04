@@ -68,7 +68,7 @@ func (s *Schema) SchemaRef() string {
 	if v := s.properties.SchemaRef; v != "" {
 		return v
 	}
-	return draft07.SchemaID
+	return SchemaID
 }
 
 func (s *Schema) AdditionalItems() *Schema {

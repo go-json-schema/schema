@@ -15,9 +15,12 @@ import (
 )
 
 type Property struct {
-	Name string
-	Type string
-	JSON string
+	Name        string
+	Type        string
+	JSON        string
+	Maybe       bool
+	Dereference bool
+	Zero        string
 }
 
 func main() {
@@ -91,42 +94,64 @@ func GenerateDraft04() error {
 			Name: "MultipleOf",
 			Type: "*float64",
 			JSON: "multipleOf",
+			Maybe:       true,
+			Dereference: true,
+			Zero:        "float64(0)",
 		},
 		{
 			Name: "Minimum",
 			Type: "*float64",
 			JSON: "minimum",
+			Maybe:       true,
+			Dereference: true,
+			Zero:        "float64(0)",
 		},
 		{
-			Name: "Maximum",
-			Type: "*float64",
-			JSON: "maximum",
+			Name:        "Maximum",
+			Type:        "*float64",
+			JSON:        "maximum",
+			Maybe:       true,
+			Dereference: true,
+			Zero:        "float64(0)",
 		},
 		{
 			Name: "ExclusiveMinimum",
 			Type: "*bool",
 			JSON: "exclusiveMinimum",
+			Maybe:       true,
+			Dereference: true,
+			Zero:        "false",
 		},
 		{
 			Name: "ExclusiveMaximum",
 			Type: "*bool",
 			JSON: "exclusiveMaximum",
+			Maybe:       true,
+			Dereference: true,
+			Zero:        "false",
 		},
 		// StringValidation
 		{
-			Name: "MaxLength",
-			Type: "*int64",
-			JSON: "maxLength",
+			Name:        "MaxLength",
+			Type:        "*int64",
+			JSON:        "maxLength",
+			Maybe:       true,
+			Dereference: true,
+			Zero:        "int64(0)",
 		},
 		{
 			Name: "MinLength",
 			Type: "*int64",
 			JSON: "minLength",
+			Maybe:       true,
+			Dereference: true,
+			Zero:        "int64(0)",
 		},
 		{
 			Name: "Pattern",
 			Type: "*regexp.Regexp",
 			JSON: "pattern",
+			Maybe:       true,
 		},
 		// ArrayValidations
 		{
@@ -236,7 +261,9 @@ func GenerateDraft04() error {
 	}
 	fmt.Fprintf(&buf, "\n}") // end type SchemaProperties
 
-	WriteGetters(&buf, "draft04", schemaProperties)
+	if err := WriteGetters(&buf, schemaProperties); err != nil {
+		return errors.Wrap(err, `failed to write getters for draft04`)
+	}
 
 	fmt.Fprintf(&buf, "\n\nfunc (s *Schema) MarshalJSON() ([]byte, error) {")
 	fmt.Fprintf(&buf, "\nreturn json.Marshal(s.properties)")
@@ -504,7 +531,9 @@ func GenerateDraft07() error {
 	}
 	fmt.Fprintf(&buf, "\n}") // end type SchemaProperties
 
-	WriteGetters(&buf, "draft07", schemaProperties)
+	if err := WriteGetters(&buf, schemaProperties); err != nil {
+		return errors.Wrap(err, `failed to write getters for draft07`)
+	}
 
 	for _, prop := range schemaProperties {
 		if strings.HasPrefix(prop.Type, `[]`) {
@@ -637,18 +666,40 @@ func (s *SchemaList) UnmarshalJSON(buf []byte) error {
 }`)
 }
 
-func WriteGetters(dst io.Writer, namespace string, properties []Property) {
+func WriteGetters(dst io.Writer, properties []Property) error {
 	for _, prop := range properties {
-		fmt.Fprintf(dst, "\n\nfunc(s *Schema) %s() %s {", prop.Name, prop.Type)
-		// SchemaRef is an exception
-		if prop.Name != "SchemaRef" {
-			fmt.Fprintf(dst, "\nreturn s.properties.%s", prop.Name)
-		} else {
+		typ := prop.Type
+		if prop.Dereference {
+			typ = strings.TrimPrefix(typ, "*")
+		}
+
+		fmt.Fprintf(dst, "\n\nfunc(s *Schema) %s() %s {", prop.Name, typ)
+		if prop.Dereference {
+			if prop.Zero == "" {
+				return errors.Errorf(`property %s needs dereferencing, but does not have a zero value for fallback`)
+			}
+			fmt.Fprintf(dst, "\nif !s.Has%s() {", prop.Name)
+			fmt.Fprintf(dst, "\nreturn %s", prop.Zero)
+			fmt.Fprintf(dst, "\n}") // end if !s.Has%s
+
+			fmt.Fprintf(dst, "\nreturn *(s.properties.%s)", prop.Name)
+		} else if prop.Name == "SchemaRef" {
+			// SchemaRef is an exception
 			fmt.Fprintf(dst, "\nif v := s.properties.%s; v != \"\" {", prop.Name)
 			fmt.Fprintf(dst, "\nreturn v")
 			fmt.Fprintf(dst, "\n}") // end of if v := s.properties.%s
-			fmt.Fprintf(dst, "\nreturn %s.SchemaID", namespace)
+			fmt.Fprintf(dst, "\nreturn SchemaID")
+		} else {
+			fmt.Fprintf(dst, "\nreturn s.properties.%s", prop.Name)
 		}
 		fmt.Fprintf(dst, "\n}") // end getter
+
+		// if this is a Maybe value, then we need to create a HasFoo() method
+		if prop.Maybe {
+			fmt.Fprintf(dst, "\n\nfunc (s *Schema) Has%s() bool {", prop.Name)
+			fmt.Fprintf(dst, "\nreturn s.properties.%s != nil", prop.Name)
+			fmt.Fprintf(dst, "\n}") // end Has%s
+		}
 	}
+	return nil
 }

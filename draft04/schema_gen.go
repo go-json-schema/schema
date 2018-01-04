@@ -52,7 +52,7 @@ func (s *Schema) SchemaRef() string {
 	if v := s.properties.SchemaRef; v != "" {
 		return v
 	}
-	return draft04.SchemaID
+	return SchemaID
 }
 
 func (s *Schema) AdditionalItems() *SchemaList {
@@ -91,12 +91,26 @@ func (s *Schema) Enum() EnumList {
 	return s.properties.Enum
 }
 
-func (s *Schema) ExclusiveMaximum() *bool {
-	return s.properties.ExclusiveMaximum
+func (s *Schema) ExclusiveMaximum() bool {
+	if !s.HasExclusiveMaximum() {
+		return false
+	}
+	return *(s.properties.ExclusiveMaximum)
 }
 
-func (s *Schema) ExclusiveMinimum() *bool {
-	return s.properties.ExclusiveMinimum
+func (s *Schema) HasExclusiveMaximum() bool {
+	return s.properties.ExclusiveMaximum != nil
+}
+
+func (s *Schema) ExclusiveMinimum() bool {
+	if !s.HasExclusiveMinimum() {
+		return false
+	}
+	return *(s.properties.ExclusiveMinimum)
+}
+
+func (s *Schema) HasExclusiveMinimum() bool {
+	return s.properties.ExclusiveMinimum != nil
 }
 
 func (s *Schema) Format() Format {
@@ -115,36 +129,71 @@ func (s *Schema) MaxItems() *int64 {
 	return s.properties.MaxItems
 }
 
-func (s *Schema) MaxLength() *int64 {
-	return s.properties.MaxLength
+func (s *Schema) MaxLength() int64 {
+	if !s.HasMaxLength() {
+		return int64(0)
+	}
+	return *(s.properties.MaxLength)
+}
+
+func (s *Schema) HasMaxLength() bool {
+	return s.properties.MaxLength != nil
 }
 
 func (s *Schema) MaxProperties() *int64 {
 	return s.properties.MaxProperties
 }
 
-func (s *Schema) Maximum() *float64 {
-	return s.properties.Maximum
+func (s *Schema) Maximum() float64 {
+	if !s.HasMaximum() {
+		return float64(0)
+	}
+	return *(s.properties.Maximum)
+}
+
+func (s *Schema) HasMaximum() bool {
+	return s.properties.Maximum != nil
 }
 
 func (s *Schema) MinItems() *int64 {
 	return s.properties.MinItems
 }
 
-func (s *Schema) MinLength() *int64 {
-	return s.properties.MinLength
+func (s *Schema) MinLength() int64 {
+	if !s.HasMinLength() {
+		return int64(0)
+	}
+	return *(s.properties.MinLength)
+}
+
+func (s *Schema) HasMinLength() bool {
+	return s.properties.MinLength != nil
 }
 
 func (s *Schema) MinProperties() *int64 {
 	return s.properties.MinProperties
 }
 
-func (s *Schema) Minimum() *float64 {
-	return s.properties.Minimum
+func (s *Schema) Minimum() float64 {
+	if !s.HasMinimum() {
+		return float64(0)
+	}
+	return *(s.properties.Minimum)
 }
 
-func (s *Schema) MultipleOf() *float64 {
-	return s.properties.MultipleOf
+func (s *Schema) HasMinimum() bool {
+	return s.properties.Minimum != nil
+}
+
+func (s *Schema) MultipleOf() float64 {
+	if !s.HasMultipleOf() {
+		return float64(0)
+	}
+	return *(s.properties.MultipleOf)
+}
+
+func (s *Schema) HasMultipleOf() bool {
+	return s.properties.MultipleOf != nil
 }
 
 func (s *Schema) Not() *Schema {
@@ -157,6 +206,10 @@ func (s *Schema) OneOf() *SchemaList {
 
 func (s *Schema) Pattern() *regexp.Regexp {
 	return s.properties.Pattern
+}
+
+func (s *Schema) HasPattern() bool {
+	return s.properties.Pattern != nil
 }
 
 func (s *Schema) PatternProperties() *SchemaSet {

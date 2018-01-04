@@ -6,4 +6,5 @@ type Option interface {
 }
 
 type Schema interface {
+	SchemaRef() string
 }

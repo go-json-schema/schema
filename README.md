@@ -2,6 +2,9 @@
 
 JSON Schema for Go: handles definition, and marshaling/unmarshaling JSON schemas
 
+[![Build Status](https://travis-ci.org/go-json-schema/schema.png?branch=master)](https://travis-ci.org/go-json-schema/schema)
+
+[![GoDoc](https://godoc.org/github.com/go-json-schema/schema?status.svg)](https://godoc.org/github.com/go-json-schema/schema)
 # SYNOPSIS
 
 ```go
@@ -29,8 +32,10 @@ func Example() {
   switch s.SchemaRef() {
   case draft04.SchemaID:
     // do draft-04 specific stuff...
+    // s.(*draft04.Schema)
   case draft07.SchemaID:
     // do draft-07 specific stuff...
+    // s.(*draft07.Schema)
   default:
     log.Printf("unknown schema")
   }
@@ -52,4 +57,8 @@ This library can parse various JSON schema versions into a
 struct, which you can then use to manipulate, such as to
 build a validator.
 
+# SUPPORTED VERSIONS
+
+* draft-04
+* draft-07
 

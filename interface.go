@@ -1,9 +1,8 @@
 package schema
 
-type Option interface {
-	Name() string
-	Value() interface{}
-}
+import "github.com/go-json-schema/schema/common"
+
+type Option = common.Option
 
 type Schema interface {
 	SchemaRef() string

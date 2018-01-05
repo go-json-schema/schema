@@ -5,6 +5,10 @@ type EnumList []Enum
 type Format string
 type PrimitiveType string
 type PrimitiveTypeList []PrimitiveType
+type Option interface {
+	Name() string
+	Value() interface{}
+}
 
 const (
 	UnspecifiedType PrimitiveType = "unspecified"

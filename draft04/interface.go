@@ -9,6 +9,7 @@ import (
 type Enum = common.Enum
 type EnumList = common.EnumList
 type Format = common.Format
+type Option = common.Option
 type PrimitiveType = common.PrimitiveType
 type PrimitiveTypeList = common.PrimitiveTypeList
 
@@ -263,11 +264,6 @@ type Schema struct {
 type Property struct {
 	Name       string
 	Definition *Schema
-}
-
-type Option interface {
-	Name() string
-	Value() interface{}
 }
 
 // DependencyMap contains the dependencies defined within this schema.

@@ -8,8 +8,8 @@ import (
 )
 
 type SchemaProperties struct {
-	Reference            string            `json:"$ref,omitempty"`
-	SchemaRef            string            `json:"$schema,omitempty"`
+	Reference            *string           `json:"$ref,omitempty"`
+	SchemaRef            *string           `json:"$schema,omitempty"`
 	AdditionalItems      *SchemaList       `json:"additionalItems,omitempty"`
 	AdditionalProperties *Schema           `json:"additionalProperties,omitempty"`
 	AllOf                *SchemaList       `json:"allOf,omitempty"`
@@ -17,12 +17,12 @@ type SchemaProperties struct {
 	Default              interface{}       `json:"default,omitempty"`
 	Definitions          *SchemaSet        `json:"definitions,omitempty"`
 	Dependencies         *DependencyMap    `json:"dependencies,omitempty"`
-	Description          string            `json:"description,omitempty"`
+	Description          *string           `json:"description,omitempty"`
 	Enum                 EnumList          `json:"enum,omitempty"`
 	ExclusiveMaximum     *bool             `json:"exclusiveMaximum,omitempty"`
 	ExclusiveMinimum     *bool             `json:"exclusiveMinimum,omitempty"`
-	Format               Format            `json:"format,omitempty"`
-	ID                   string            `json:"id,omitempty"`
+	Format               *Format           `json:"format,omitempty"`
+	ID                   *string           `json:"id,omitempty"`
 	Items                *Schema           `json:"items,omitempty"`
 	MaxItems             *int64            `json:"maxItems,omitempty"`
 	MaxLength            *int64            `json:"maxLength,omitempty"`
@@ -39,56 +39,106 @@ type SchemaProperties struct {
 	PatternProperties    *SchemaSet        `json:"patternProperties,omitempty"`
 	Properties           *SchemaSet        `json:"properties,omitempty"`
 	Required             []string          `json:"required,omitempty"`
-	Title                string            `json:"title,omitempty"`
+	Title                *string           `json:"title,omitempty"`
 	Type                 PrimitiveTypeList `json:"type,omitempty"`
 	UniqueItems          *bool             `json:"uniqueItems,omitempty"`
 }
 
 func (s *Schema) Reference() string {
-	return s.properties.Reference
+	if !s.HasReference() {
+		return ""
+	}
+	return *(s.properties.Reference)
+}
+
+func (s *Schema) HasReference() bool {
+	return s.properties.Reference != nil
 }
 
 func (s *Schema) SchemaRef() string {
-	if v := s.properties.SchemaRef; v != "" {
-		return v
+	if !s.HasSchemaRef() {
+		return SchemaID
 	}
-	return SchemaID
+	return *(s.properties.SchemaRef)
+}
+
+func (s *Schema) HasSchemaRef() bool {
+	return s.properties.SchemaRef != nil
 }
 
 func (s *Schema) AdditionalItems() *SchemaList {
 	return s.properties.AdditionalItems
 }
 
+func (s *Schema) HasAdditionalItems() bool {
+	return s.properties.AdditionalItems != nil
+}
+
 func (s *Schema) AdditionalProperties() *Schema {
 	return s.properties.AdditionalProperties
+}
+
+func (s *Schema) HasAdditionalProperties() bool {
+	return s.properties.AdditionalProperties != nil
 }
 
 func (s *Schema) AllOf() *SchemaList {
 	return s.properties.AllOf
 }
 
+func (s *Schema) HasAllOf() bool {
+	return s.properties.AllOf != nil
+}
+
 func (s *Schema) AnyOf() *SchemaList {
 	return s.properties.AnyOf
+}
+
+func (s *Schema) HasAnyOf() bool {
+	return s.properties.AnyOf != nil
 }
 
 func (s *Schema) Default() interface{} {
 	return s.properties.Default
 }
 
+func (s *Schema) HasDefault() bool {
+	return s.properties.Default != nil
+}
+
 func (s *Schema) Definitions() *SchemaSet {
 	return s.properties.Definitions
+}
+
+func (s *Schema) HasDefinitions() bool {
+	return s.properties.Definitions != nil
 }
 
 func (s *Schema) Dependencies() *DependencyMap {
 	return s.properties.Dependencies
 }
 
+func (s *Schema) HasDependencies() bool {
+	return s.properties.Dependencies != nil
+}
+
 func (s *Schema) Description() string {
-	return s.properties.Description
+	if !s.HasDescription() {
+		return ""
+	}
+	return *(s.properties.Description)
+}
+
+func (s *Schema) HasDescription() bool {
+	return s.properties.Description != nil
 }
 
 func (s *Schema) Enum() EnumList {
 	return s.properties.Enum
+}
+
+func (s *Schema) HasEnum() bool {
+	return s.properties.Enum != nil
 }
 
 func (s *Schema) ExclusiveMaximum() bool {
@@ -114,19 +164,44 @@ func (s *Schema) HasExclusiveMinimum() bool {
 }
 
 func (s *Schema) Format() Format {
-	return s.properties.Format
+	if !s.HasFormat() {
+		return Format("")
+	}
+	return *(s.properties.Format)
+}
+
+func (s *Schema) HasFormat() bool {
+	return s.properties.Format != nil
 }
 
 func (s *Schema) ID() string {
-	return s.properties.ID
+	if !s.HasID() {
+		return ""
+	}
+	return *(s.properties.ID)
+}
+
+func (s *Schema) HasID() bool {
+	return s.properties.ID != nil
 }
 
 func (s *Schema) Items() *Schema {
 	return s.properties.Items
 }
 
-func (s *Schema) MaxItems() *int64 {
-	return s.properties.MaxItems
+func (s *Schema) HasItems() bool {
+	return s.properties.Items != nil
+}
+
+func (s *Schema) MaxItems() int64 {
+	if !s.HasMaxItems() {
+		return int64(0)
+	}
+	return *(s.properties.MaxItems)
+}
+
+func (s *Schema) HasMaxItems() bool {
+	return s.properties.MaxItems != nil
 }
 
 func (s *Schema) MaxLength() int64 {
@@ -144,6 +219,10 @@ func (s *Schema) MaxProperties() *int64 {
 	return s.properties.MaxProperties
 }
 
+func (s *Schema) HasMaxProperties() bool {
+	return s.properties.MaxProperties != nil
+}
+
 func (s *Schema) Maximum() float64 {
 	if !s.HasMaximum() {
 		return float64(0)
@@ -155,8 +234,15 @@ func (s *Schema) HasMaximum() bool {
 	return s.properties.Maximum != nil
 }
 
-func (s *Schema) MinItems() *int64 {
-	return s.properties.MinItems
+func (s *Schema) MinItems() int64 {
+	if !s.HasMinItems() {
+		return int64(0)
+	}
+	return *(s.properties.MinItems)
+}
+
+func (s *Schema) HasMinItems() bool {
+	return s.properties.MinItems != nil
 }
 
 func (s *Schema) MinLength() int64 {
@@ -172,6 +258,10 @@ func (s *Schema) HasMinLength() bool {
 
 func (s *Schema) MinProperties() *int64 {
 	return s.properties.MinProperties
+}
+
+func (s *Schema) HasMinProperties() bool {
+	return s.properties.MinProperties != nil
 }
 
 func (s *Schema) Minimum() float64 {
@@ -200,8 +290,16 @@ func (s *Schema) Not() *Schema {
 	return s.properties.Not
 }
 
+func (s *Schema) HasNot() bool {
+	return s.properties.Not != nil
+}
+
 func (s *Schema) OneOf() *SchemaList {
 	return s.properties.OneOf
+}
+
+func (s *Schema) HasOneOf() bool {
+	return s.properties.OneOf != nil
 }
 
 func (s *Schema) Pattern() *regexp.Regexp {
@@ -216,24 +314,54 @@ func (s *Schema) PatternProperties() *SchemaSet {
 	return s.properties.PatternProperties
 }
 
+func (s *Schema) HasPatternProperties() bool {
+	return s.properties.PatternProperties != nil
+}
+
 func (s *Schema) Properties() *SchemaSet {
 	return s.properties.Properties
+}
+
+func (s *Schema) HasProperties() bool {
+	return s.properties.Properties != nil
 }
 
 func (s *Schema) Required() []string {
 	return s.properties.Required
 }
 
+func (s *Schema) HasRequired() bool {
+	return s.properties.Required != nil
+}
+
 func (s *Schema) Title() string {
-	return s.properties.Title
+	if !s.HasTitle() {
+		return ""
+	}
+	return *(s.properties.Title)
+}
+
+func (s *Schema) HasTitle() bool {
+	return s.properties.Title != nil
 }
 
 func (s *Schema) Type() PrimitiveTypeList {
 	return s.properties.Type
 }
 
-func (s *Schema) UniqueItems() *bool {
-	return s.properties.UniqueItems
+func (s *Schema) HasType() bool {
+	return s.properties.Type != nil
+}
+
+func (s *Schema) UniqueItems() bool {
+	if !s.HasUniqueItems() {
+		return false
+	}
+	return *(s.properties.UniqueItems)
+}
+
+func (s *Schema) HasUniqueItems() bool {
+	return s.properties.UniqueItems != nil
 }
 
 func (s *Schema) MarshalJSON() ([]byte, error) {

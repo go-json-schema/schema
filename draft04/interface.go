@@ -13,13 +13,14 @@ type PrimitiveType = common.PrimitiveType
 type PrimitiveTypeList = common.PrimitiveTypeList
 
 const (
-	NullType    = common.NullType
-	BooleanType = common.BooleanType
-	ObjectType  = common.ObjectType
-	ArrayType   = common.ArrayType
-	NumberType  = common.NumberType
-	StringType  = common.StringType
-	IntegerType = common.IntegerType
+	UnspecifiedType = common.UnspecifiedType
+	NullType        = common.NullType
+	BooleanType     = common.BooleanType
+	ObjectType      = common.ObjectType
+	ArrayType       = common.ArrayType
+	NumberType      = common.NumberType
+	StringType      = common.StringType
+	IntegerType     = common.IntegerType
 )
 
 const SchemaID = "http://json-schema.org/draft-04/schema#"
@@ -273,6 +274,6 @@ type Option interface {
 // for a given dependency name, you can have either a schema or a
 // list of property names
 type DependencyMap struct {
-  names   map[string][]string
-  schemas *SchemaSet
+	names   map[string][]string
+	schemas *SchemaSet
 }

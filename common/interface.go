@@ -7,13 +7,12 @@ type PrimitiveType string
 type PrimitiveTypeList []PrimitiveType
 
 const (
-	NullType    PrimitiveType = "null"
-	BooleanType               = "boolean"
-	ObjectType                = "object"
-	ArrayType                 = "array"
-	NumberType                = "number"
-	StringType                = "string"
-	IntegerType               = "integer"
+	UnspecifiedType PrimitiveType = "unspecified"
+	NullType                      = "null"
+	BooleanType                   = "boolean"
+	ObjectType                    = "object"
+	ArrayType                     = "array"
+	NumberType                    = "number"
+	StringType                    = "string"
+	IntegerType                   = "integer"
 )
-
-

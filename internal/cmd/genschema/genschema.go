@@ -15,12 +15,11 @@ import (
 )
 
 type Property struct {
-	Name        string
-	Type        string
-	JSON        string
-	Maybe       bool
-	Dereference bool
-	Zero        string
+	Name  string
+	Type  string
+	JSON  string
+	Deref bool
+	Zero  string
 }
 
 func main() {
@@ -44,19 +43,25 @@ func _main() error {
 func GenerateDraft04() error {
 	schemaProperties := []Property{
 		{
-			Name: "ID",
-			Type: "string",
-			JSON: "id",
+			Name:  "ID",
+			Type:  "*string",
+			JSON:  "id",
+			Deref: true,
+			Zero:  `""`,
 		},
 		{
-			Name: "Title",
-			Type: "string",
-			JSON: "title",
+			Name:  "Title",
+			Type:  "*string",
+			JSON:  "title",
+			Deref: true,
+			Zero:  `""`,
 		},
 		{
-			Name: "Description",
-			Type: "string",
-			JSON: "description",
+			Name:  "Description",
+			Type:  "*string",
+			JSON:  "description",
+			Deref: true,
+			Zero:  `""`,
 		},
 		{
 			Name: "Default",
@@ -69,9 +74,11 @@ func GenerateDraft04() error {
 			JSON: "type",
 		},
 		{
-			Name: "SchemaRef",
-			Type: "string",
-			JSON: "$schema",
+			Name:  "SchemaRef",
+			Type:  "*string",
+			JSON:  "$schema",
+			Deref: true,
+			Zero:  "SchemaID",
 		},
 		{
 			Name: "Definitions",
@@ -79,79 +86,75 @@ func GenerateDraft04() error {
 			JSON: "definitions",
 		},
 		{
-			Name: "Reference",
-			Type: "string",
-			JSON: "$ref",
+			Name:  "Reference",
+			Type:  "*string",
+			JSON:  "$ref",
+			Deref: true,
+			Zero:  `""`,
 		},
 		{
-			Name: "Format",
-			Type: "Format",
-			JSON: "format",
+			Name:  "Format",
+			Type:  "*Format",
+			JSON:  "format",
+			Deref: true,
+			Zero:  `Format("")`,
 		},
 
 		// NumericValidations
 		{
-			Name: "MultipleOf",
-			Type: "*float64",
-			JSON: "multipleOf",
-			Maybe:       true,
-			Dereference: true,
-			Zero:        "float64(0)",
+			Name:  "MultipleOf",
+			Type:  "*float64",
+			JSON:  "multipleOf",
+			Deref: true,
+			Zero:  "float64(0)",
 		},
 		{
-			Name: "Minimum",
-			Type: "*float64",
-			JSON: "minimum",
-			Maybe:       true,
-			Dereference: true,
-			Zero:        "float64(0)",
+			Name:  "Minimum",
+			Type:  "*float64",
+			JSON:  "minimum",
+			Deref: true,
+			Zero:  "float64(0)",
 		},
 		{
-			Name:        "Maximum",
-			Type:        "*float64",
-			JSON:        "maximum",
-			Maybe:       true,
-			Dereference: true,
-			Zero:        "float64(0)",
+			Name:  "Maximum",
+			Type:  "*float64",
+			JSON:  "maximum",
+			Deref: true,
+			Zero:  "float64(0)",
 		},
 		{
-			Name: "ExclusiveMinimum",
-			Type: "*bool",
-			JSON: "exclusiveMinimum",
-			Maybe:       true,
-			Dereference: true,
-			Zero:        "false",
+			Name:  "ExclusiveMinimum",
+			Type:  "*bool",
+			JSON:  "exclusiveMinimum",
+			Deref: true,
+			Zero:  "false",
 		},
 		{
-			Name: "ExclusiveMaximum",
-			Type: "*bool",
-			JSON: "exclusiveMaximum",
-			Maybe:       true,
-			Dereference: true,
-			Zero:        "false",
+			Name:  "ExclusiveMaximum",
+			Type:  "*bool",
+			JSON:  "exclusiveMaximum",
+			Deref: true,
+			Zero:  "false",
 		},
 		// StringValidation
 		{
-			Name:        "MaxLength",
-			Type:        "*int64",
-			JSON:        "maxLength",
-			Maybe:       true,
-			Dereference: true,
-			Zero:        "int64(0)",
+			Name:  "MaxLength",
+			Type:  "*int64",
+			JSON:  "maxLength",
+			Deref: true,
+			Zero:  "int64(0)",
 		},
 		{
-			Name: "MinLength",
-			Type: "*int64",
-			JSON: "minLength",
-			Maybe:       true,
-			Dereference: true,
-			Zero:        "int64(0)",
+			Name:  "MinLength",
+			Type:  "*int64",
+			JSON:  "minLength",
+			Deref: true,
+			Zero:  "int64(0)",
 		},
 		{
 			Name: "Pattern",
 			Type: "*regexp.Regexp",
 			JSON: "pattern",
-			Maybe:       true,
 		},
 		// ArrayValidations
 		{
@@ -165,19 +168,25 @@ func GenerateDraft04() error {
 			JSON: "items",
 		},
 		{
-			Name: "MinItems",
-			Type: "*int64",
-			JSON: "minItems",
+			Name:  "MinItems",
+			Type:  "*int64",
+			JSON:  "minItems",
+			Deref: true,
+			Zero:  "int64(0)",
 		},
 		{
-			Name: "MaxItems",
-			Type: "*int64",
-			JSON: "maxItems",
+			Name:  "MaxItems",
+			Type:  "*int64",
+			JSON:  "maxItems",
+			Deref: true,
+			Zero:  "int64(0)",
 		},
 		{
-			Name: "UniqueItems",
-			Type: "*bool",
-			JSON: "uniqueItems",
+			Name:  "UniqueItems",
+			Type:  "*bool",
+			JSON:  "uniqueItems",
+			Deref: true,
+			Zero:  "false",
 		},
 
 		// ObjectValidations
@@ -285,35 +294,47 @@ func GenerateDraft04() error {
 func GenerateDraft07() error {
 	var schemaProperties = []Property{
 		{
-			Name: "SchemaRef",
-			Type: "string",
-			JSON: "$schema",
+			Name:  "SchemaRef",
+			Type:  "*string",
+			JSON:  "$schema",
+			Deref: true,
+			Zero:  "SchemaID",
 		},
 		{
-			Name: "Reference",
-			Type: "string",
-			JSON: "$ref",
+			Name:  "Reference",
+			Type:  "*string",
+			JSON:  "$ref",
+			Deref: true,
+			Zero:  `""`,
 		},
 
 		{
-			Name: "ID",
-			Type: "string",
-			JSON: "$id",
+			Name:  "ID",
+			Type:  "*string",
+			JSON:  "$id",
+			Deref: true,
+			Zero:  `""`,
 		},
 		{
-			Name: "Comment",
-			Type: "string",
-			JSON: "$comment",
+			Name:  "Comment",
+			Type:  "*string",
+			JSON:  "$comment",
+			Deref: true,
+			Zero:  `""`,
 		},
 		{
-			Name: "Title",
-			Type: "string",
-			JSON: "title",
+			Name:  "Title",
+			Type:  "*string",
+			JSON:  "title",
+			Deref: true,
+			Zero:  `""`,
 		},
 		{
-			Name: "Description",
-			Type: "string",
-			JSON: "description",
+			Name:  "Description",
+			Type:  "*string",
+			JSON:  "description",
+			Deref: true,
+			Zero:  `""`,
 		},
 		{
 			Name: "Definitions",
@@ -345,41 +366,55 @@ func GenerateDraft07() error {
 
 		// 6.2.  Validation Keywords for Numeric Instances (number and integer)
 		{
-			Name: "MultipleOf",
-			Type: "*float64",
-			JSON: "multipleOf",
+			Name:  "MultipleOf",
+			Type:  "*float64",
+			JSON:  "multipleOf",
+			Deref: true,
+			Zero:  "float64(0)",
 		},
 		{
-			Name: "Maximum",
-			Type: "*float64",
-			JSON: "maximum",
+			Name:  "Maximum",
+			Type:  "*float64",
+			JSON:  "maximum",
+			Deref: true,
+			Zero:  "float64(0)",
 		},
 		{
-			Name: "Minimum",
-			Type: "*float64",
-			JSON: "minimum",
+			Name:  "Minimum",
+			Type:  "*float64",
+			JSON:  "minimum",
+			Deref: true,
+			Zero:  "float64(0)",
 		},
 		{
-			Name: "ExclusiveMaximum",
-			Type: "*float64",
-			JSON: "exclusiveMaximum",
+			Name:  "ExclusiveMaximum",
+			Type:  "*float64",
+			JSON:  "exclusiveMaximum",
+			Deref: true,
+			Zero:  "float64(0)",
 		},
 		{
-			Name: "ExclusiveMinimum",
-			Type: "*float64",
-			JSON: "exclusiveMinimum",
+			Name:  "ExclusiveMinimum",
+			Type:  "*float64",
+			JSON:  "exclusiveMinimum",
+			Deref: true,
+			Zero:  "float64(0)",
 		},
 
 		// 6.3.  Validation Keywords for Strings
 		{
-			Name: "MaxLength",
-			Type: "*int64",
-			JSON: "maxLength",
+			Name:  "MaxLength",
+			Type:  "*int64",
+			JSON:  "maxLength",
+			Deref: true,
+			Zero:  "int64(0)",
 		},
 		{
-			Name: "MinLength",
-			Type: "*int64",
-			JSON: "minLength",
+			Name:  "MinLength",
+			Type:  "*int64",
+			JSON:  "minLength",
+			Deref: true,
+			Zero:  "int64(0)",
 		},
 		{
 			Name: "Pattern",
@@ -399,19 +434,25 @@ func GenerateDraft07() error {
 			JSON: "additionalItems",
 		},
 		{
-			Name: "MaxItems",
-			Type: "*int64",
-			JSON: "maxItems",
+			Name:  "MaxItems",
+			Type:  "*int64",
+			JSON:  "maxItems",
+			Deref: true,
+			Zero:  "int64(0)",
 		},
 		{
-			Name: "MinItems",
-			Type: "*int64",
-			JSON: "minItems",
+			Name:  "MinItems",
+			Type:  "*int64",
+			JSON:  "minItems",
+			Deref: true,
+			Zero:  "int64(0)",
 		},
 		{
-			Name: "UniqueItems",
-			Type: "*bool",
-			JSON: "uniqueItems",
+			Name:  "UniqueItems",
+			Type:  "*bool",
+			JSON:  "uniqueItems",
+			Deref: true,
+			Zero:  "false",
 		},
 		{
 			Name: "Contains",
@@ -421,14 +462,18 @@ func GenerateDraft07() error {
 
 		// 6.5.  Validation Keywords for Objects
 		{
-			Name: "MaxProperties",
-			Type: "*int64",
-			JSON: "maxProperties",
+			Name:  "MaxProperties",
+			Type:  "*int64",
+			JSON:  "maxProperties",
+			Deref: true,
+			Zero:  "int64(0)",
 		},
 		{
-			Name: "MinProperties",
-			Type: "*int64",
-			JSON: "minProperties",
+			Name:  "MinProperties",
+			Type:  "*int64",
+			JSON:  "minProperties",
+			Deref: true,
+			Zero:  "int64(0)",
 		},
 		{
 			Name: "Required",
@@ -502,9 +547,11 @@ func GenerateDraft07() error {
 
 		// 7.  Semantic Validation With "format"
 		{
-			Name: "Format",
-			Type: "Format",
-			JSON: "format",
+			Name:  "Format",
+			Type:  "*Format",
+			JSON:  "format",
+			Deref: true,
+			Zero:  `Format("")`,
 		},
 	}
 
@@ -669,12 +716,12 @@ func (s *SchemaList) UnmarshalJSON(buf []byte) error {
 func WriteGetters(dst io.Writer, properties []Property) error {
 	for _, prop := range properties {
 		typ := prop.Type
-		if prop.Dereference {
+		if prop.Deref {
 			typ = strings.TrimPrefix(typ, "*")
 		}
 
 		fmt.Fprintf(dst, "\n\nfunc(s *Schema) %s() %s {", prop.Name, typ)
-		if prop.Dereference {
+		if prop.Deref {
 			if prop.Zero == "" {
 				return errors.Errorf(`property %s needs dereferencing, but does not have a zero value for fallback`)
 			}
@@ -683,23 +730,15 @@ func WriteGetters(dst io.Writer, properties []Property) error {
 			fmt.Fprintf(dst, "\n}") // end if !s.Has%s
 
 			fmt.Fprintf(dst, "\nreturn *(s.properties.%s)", prop.Name)
-		} else if prop.Name == "SchemaRef" {
-			// SchemaRef is an exception
-			fmt.Fprintf(dst, "\nif v := s.properties.%s; v != \"\" {", prop.Name)
-			fmt.Fprintf(dst, "\nreturn v")
-			fmt.Fprintf(dst, "\n}") // end of if v := s.properties.%s
-			fmt.Fprintf(dst, "\nreturn SchemaID")
 		} else {
 			fmt.Fprintf(dst, "\nreturn s.properties.%s", prop.Name)
 		}
 		fmt.Fprintf(dst, "\n}") // end getter
 
-		// if this is a Maybe value, then we need to create a HasFoo() method
-		if prop.Maybe {
-			fmt.Fprintf(dst, "\n\nfunc (s *Schema) Has%s() bool {", prop.Name)
-			fmt.Fprintf(dst, "\nreturn s.properties.%s != nil", prop.Name)
-			fmt.Fprintf(dst, "\n}") // end Has%s
-		}
+		// we need to create a HasFoo() method
+		fmt.Fprintf(dst, "\n\nfunc (s *Schema) Has%s() bool {", prop.Name)
+		fmt.Fprintf(dst, "\nreturn s.properties.%s != nil", prop.Name)
+		fmt.Fprintf(dst, "\n}") // end Has%s
 	}
 	return nil
 }

@@ -6,6 +6,10 @@ import (
 	"github.com/pkg/errors"
 )
 
+func (t PrimitiveType) String() string {
+	return string(t)
+}
+
 func (l PrimitiveTypeList) Len() int {
 	return len(l)
 }

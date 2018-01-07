@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/go-json-schema/schema/common"
 	"github.com/pkg/errors"
 )
 
@@ -24,4 +25,12 @@ func Parse(src io.Reader, options ...Option) (*Schema, error) {
 		return nil, errors.Wrap(err, `failed to unmarshal schema`)
 	}
 	return &s, nil
+}
+
+func (p *Property) Name() string {
+	return p.name
+}
+
+func (p *Property) Definition() common.Schema {
+	return p.definition
 }

@@ -261,15 +261,15 @@ type Schema struct {
 	properties *SchemaProperties
 }
 
-type Property struct {
-	Name       string
-	Definition *Schema
-}
-
 // DependencyMap contains the dependencies defined within this schema.
 // for a given dependency name, you can have either a schema or a
 // list of property names
 type DependencyMap struct {
 	names   map[string][]string
 	schemas *SchemaSet
+}
+
+type Property struct {
+	name       string
+	definition *Schema
 }

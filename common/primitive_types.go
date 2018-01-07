@@ -6,6 +6,18 @@ import (
 	"github.com/pkg/errors"
 )
 
+func (l PrimitiveTypeList) Len() int {
+	return len(l)
+}
+
+func (l PrimitiveTypeList) Less(i, j int) bool {
+	return l[i] < l[j]
+}
+
+func (l PrimitiveTypeList) Swap(i, j int) {
+	l[i], l[j] = l[j], l[i]
+}
+
 func (l *PrimitiveTypeList) Append(list ...PrimitiveType) {
 	*l = append(*l, list...)
 }

@@ -286,6 +286,6 @@ type Schema struct {
 }
 
 type Property struct {
-	Name       string
-	Definition *Schema
+	name       string
+	definition *Schema
 }

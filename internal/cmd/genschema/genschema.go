@@ -164,7 +164,7 @@ func GenerateDraft04() error {
 		},
 		{
 			Name: "Items",
-			Type: "*Schema",
+			Type: "*SchemaList",
 			JSON: "items",
 		},
 		{
@@ -667,7 +667,7 @@ func (s *SchemaSet) Iterator() <-chan *Property {
 		defer s.mu.RUnlock()
 		defer close(ch)
 		for k, v := range s.store {
-			ch <- &Property{Name: k, Definition: v}
+			ch <- &Property{name: k, definition: v}
 		}
 	}()
 	return ch
@@ -685,7 +685,24 @@ func (s *SchemaSet) UnmarshalJSON(buf []byte) error {
 	return json.Unmarshal(buf, &s.store)
 }
 
+func (s *SchemaList) Iterator() <-chan *Schema {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	ch := make(chan *Schema, len(s.store))
+	go func() {
+		defer close(ch)
+		s.mu.RLock()
+		defer s.mu.RUnlock()
+		for _, e := range s.store {
+			ch <- e
+		}
+	}()
+	return ch
+}
+
 func (s *SchemaList) Append(list ...*Schema) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.store = append(s.store, list...)
 }
 

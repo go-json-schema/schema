@@ -9,7 +9,7 @@ import (
 func (m *DependencyMap) MarshalJSON() ([]byte, error) {
 	out := make(map[string]interface{})
 	for prop := range m.schemas.Iterator() {
-		out[prop.Name] = prop.Definition
+		out[prop.Name()] = prop.Definition()
 	}
 	for k, v := range m.names {
 		out[k] = v

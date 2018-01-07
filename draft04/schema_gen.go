@@ -23,7 +23,7 @@ type SchemaProperties struct {
 	ExclusiveMinimum     *bool             `json:"exclusiveMinimum,omitempty"`
 	Format               *Format           `json:"format,omitempty"`
 	ID                   *string           `json:"id,omitempty"`
-	Items                *Schema           `json:"items,omitempty"`
+	Items                *SchemaList       `json:"items,omitempty"`
 	MaxItems             *int64            `json:"maxItems,omitempty"`
 	MaxLength            *int64            `json:"maxLength,omitempty"`
 	MaxProperties        *int64            `json:"maxProperties,omitempty"`
@@ -185,7 +185,7 @@ func (s *Schema) HasID() bool {
 	return s.properties.ID != nil
 }
 
-func (s *Schema) Items() *Schema {
+func (s *Schema) Items() *SchemaList {
 	return s.properties.Items
 }
 
@@ -383,7 +383,7 @@ func (s *SchemaSet) Iterator() <-chan *Property {
 		defer s.mu.RUnlock()
 		defer close(ch)
 		for k, v := range s.store {
-			ch <- &Property{Name: k, Definition: v}
+			ch <- &Property{name: k, definition: v}
 		}
 	}()
 	return ch
@@ -401,7 +401,24 @@ func (s *SchemaSet) UnmarshalJSON(buf []byte) error {
 	return json.Unmarshal(buf, &s.store)
 }
 
+func (s *SchemaList) Iterator() <-chan *Schema {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	ch := make(chan *Schema, len(s.store))
+	go func() {
+		defer close(ch)
+		s.mu.RLock()
+		defer s.mu.RUnlock()
+		for _, e := range s.store {
+			ch <- e
+		}
+	}()
+	return ch
+}
+
 func (s *SchemaList) Append(list ...*Schema) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.store = append(s.store, list...)
 }
 

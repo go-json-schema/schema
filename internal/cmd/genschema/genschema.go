@@ -191,10 +191,18 @@ func GenerateDraft04() error {
 
 		// ObjectValidations
 		{
-			Name: "MaxProperties", Type: "*int64", JSON: "maxProperties",
+			Name: "MaxProperties",
+			Type: "*int64",
+			JSON: "maxProperties",
+			Deref: true,
+			Zero: "int64(0)",
 		},
 		{
-			Name: "MinProperties", Type: "*int64", JSON: "minProperties",
+			Name: "MinProperties",
+			Type: "*int64",
+			JSON: "minProperties",
+			Deref: true,
+			Zero: "int64(0)",
 		},
 		{
 			Name: "Required",

@@ -215,8 +215,11 @@ func (s *Schema) HasMaxLength() bool {
 	return s.properties.MaxLength != nil
 }
 
-func (s *Schema) MaxProperties() *int64 {
-	return s.properties.MaxProperties
+func (s *Schema) MaxProperties() int64 {
+	if !s.HasMaxProperties() {
+		return int64(0)
+	}
+	return *(s.properties.MaxProperties)
 }
 
 func (s *Schema) HasMaxProperties() bool {
@@ -256,8 +259,11 @@ func (s *Schema) HasMinLength() bool {
 	return s.properties.MinLength != nil
 }
 
-func (s *Schema) MinProperties() *int64 {
-	return s.properties.MinProperties
+func (s *Schema) MinProperties() int64 {
+	if !s.HasMinProperties() {
+		return int64(0)
+	}
+	return *(s.properties.MinProperties)
 }
 
 func (s *Schema) HasMinProperties() bool {

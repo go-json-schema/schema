@@ -11,21 +11,8 @@ type Option interface {
 	Value() interface{}
 }
 
-type Property interface {
-	Name() string
-	Definition() Schema
-}
-
 type Schema interface {
 	SchemaRef() string
-}
-
-type SchemaList interface {
-	Iterator() <-chan Schema
-}
-
-type SchemaSet interface {
-	Iterator() <-chan *Property
 }
 
 const (

@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/go-json-schema/schema/common"
+	pdebug "github.com/lestrrat/go-pdebug"
 	"github.com/pkg/errors"
 )
 
@@ -19,18 +19,15 @@ func ParseFile(fn string) (*Schema, error) {
 	return Parse(f)
 }
 
-func Parse(src io.Reader, options ...Option) (*Schema, error) {
-	var s Schema
-	if err := json.NewDecoder(src).Decode(&s); err != nil {
+func Parse(src io.Reader, options ...Option) (s *Schema, err error) {
+	if pdebug.Enabled {
+		g := pdebug.Marker("draft04.Parse").BindError(&err)
+		defer g.End()
+	}
+
+	var s1 Schema
+	if err := json.NewDecoder(src).Decode(&s1); err != nil {
 		return nil, errors.Wrap(err, `failed to unmarshal schema`)
 	}
-	return &s, nil
-}
-
-func (p *Property) Name() string {
-	return p.name
-}
-
-func (p *Property) Definition() common.Schema {
-	return p.definition
+	return &s1, nil
 }

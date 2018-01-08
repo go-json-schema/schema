@@ -26,6 +26,26 @@ func (l *PrimitiveTypeList) Append(list ...PrimitiveType) {
 	*l = append(*l, list...)
 }
 
+func (l PrimitiveTypeList) Contains(v PrimitiveType) bool {
+	for x := range l.Iterator() {
+		if x == v {
+			return true
+		}
+	}
+	return false
+}
+
+func (l PrimitiveTypeList) Iterator() <-chan PrimitiveType {
+	ch := make(chan PrimitiveType, len(l))
+	go func() {
+		defer close(ch)
+		for _, e := range l {
+			ch <- e
+		}
+	}()
+	return ch
+}
+
 func (l *PrimitiveTypeList) MarshalJSON() ([]byte, error) {
 	if len(*l) == 1 {
 		return json.Marshal((*l)[0])

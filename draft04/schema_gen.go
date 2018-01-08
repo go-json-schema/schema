@@ -2,12 +2,23 @@ package draft04
 
 import (
 	"encoding/json"
-	"regexp"
 
 	"github.com/pkg/errors"
 )
 
-type SchemaProperties struct {
+type Property struct {
+	name       string
+	definition *Schema
+}
+
+func (p *Property) Name() string {
+	return p.name
+}
+func (p *Property) Definition() *Schema {
+	return p.definition
+}
+
+type schemaProperties struct {
 	Reference            *string           `json:"$ref,omitempty"`
 	SchemaRef            *string           `json:"$schema,omitempty"`
 	AdditionalItems      *SchemaList       `json:"additionalItems,omitempty"`
@@ -35,7 +46,7 @@ type SchemaProperties struct {
 	MultipleOf           *float64          `json:"multipleOf,omitempty"`
 	Not                  *Schema           `json:"not,omitempty"`
 	OneOf                *SchemaList       `json:"oneOf,omitempty"`
-	Pattern              *regexp.Regexp    `json:"pattern,omitempty"`
+	Pattern              *string           `json:"pattern,omitempty"`
 	PatternProperties    *SchemaSet        `json:"patternProperties,omitempty"`
 	Properties           *SchemaSet        `json:"properties,omitempty"`
 	Required             []string          `json:"required,omitempty"`
@@ -308,8 +319,11 @@ func (s *Schema) HasOneOf() bool {
 	return s.properties.OneOf != nil
 }
 
-func (s *Schema) Pattern() *regexp.Regexp {
-	return s.properties.Pattern
+func (s *Schema) Pattern() string {
+	if !s.HasPattern() {
+		return ""
+	}
+	return *(s.properties.Pattern)
 }
 
 func (s *Schema) HasPattern() bool {
@@ -375,7 +389,7 @@ func (s *Schema) MarshalJSON() ([]byte, error) {
 }
 
 func (s *Schema) UnmarshalJSON(buf []byte) error {
-	var props SchemaProperties
+	var props schemaProperties
 	if err := json.Unmarshal(buf, &props); err != nil {
 		return errors.Wrap(err, `failed to unmarshal schema`)
 	}

@@ -258,7 +258,7 @@ type SchemaList struct {
 }
 
 type Schema struct {
-	properties *SchemaProperties
+	properties *schemaProperties
 }
 
 // DependencyMap contains the dependencies defined within this schema.
@@ -267,9 +267,4 @@ type Schema struct {
 type DependencyMap struct {
 	names   map[string][]string
 	schemas *SchemaSet
-}
-
-type Property struct {
-	name       string
-	definition *Schema
 }

@@ -4,9 +4,11 @@ package schema
 
 import (
 	"io"
+	"os"
 
 	"github.com/go-json-schema/schema/draft04"
 	"github.com/go-json-schema/schema/draft07"
+	pdebug "github.com/lestrrat/go-pdebug"
 	"github.com/pkg/errors"
 )
 
@@ -26,7 +28,21 @@ func toDraft07Options(options ...Option) []draft07.Option {
 	return list
 }
 
-func Parse(src io.Reader, options ...Option) (Schema, error) {
+func ParseFile(fn string, options ...Option) (Schema, error) {
+	f, err := os.Open(fn)
+	if err != nil {
+		return nil, errors.Wrapf(err, `failed to open file %s`, fn)
+	}
+	defer f.Close()
+	return Parse(f, options...)
+}
+
+func Parse(src io.Reader, options ...Option) (s Schema, err error) {
+	if pdebug.Enabled {
+		g := pdebug.Marker("schema.Parse").BindError(&err)
+		defer g.End()
+	}
+
 	draftVersion := draft07.SchemaID
 
 	for _, o := range options {

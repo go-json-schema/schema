@@ -282,10 +282,5 @@ type SchemaList struct {
 type Schema struct {
 	isEmpty    bool
 	isNegated  bool
-	properties *SchemaProperties
-}
-
-type Property struct {
-	name       string
-	definition *Schema
+	properties *schemaProperties
 }

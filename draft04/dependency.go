@@ -6,6 +6,14 @@ import (
 	"github.com/pkg/errors"
 )
 
+func (m *DependencyMap) Names() map[string][]string {
+	return m.names
+}
+
+func (m *DependencyMap) Schemas() *SchemaSet {
+	return m.schemas
+}
+
 func (m *DependencyMap) MarshalJSON() ([]byte, error) {
 	out := make(map[string]interface{})
 	for prop := range m.schemas.Iterator() {

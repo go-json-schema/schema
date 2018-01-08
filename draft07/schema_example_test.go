@@ -3,7 +3,7 @@ package draft07_test
 import (
 	"log"
 
-	"github.com/lestrrat/go-jsschema/draft07"
+	"github.com/go-json-schema/schema/draft07"
 )
 
 func Example() {
@@ -16,8 +16,8 @@ func Example() {
 	for prop := range s.Properties().Iterator() {
 		// Do what you will with `pdef`, which contain
 		// Schema information for `name` property
-		_ = prop.Name
-		_ = prop.Definition
+		_ = prop.Name()
+		_ = prop.Definition()
 	}
 
 	/*

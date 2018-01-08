@@ -153,8 +153,12 @@ func GenerateDraft04() error {
 		},
 		{
 			Name: "Pattern",
-			Type: "*regexp.Regexp",
+			// we would like this to be *regexp.Regexp, but json.Unmarshal cannot handle
+			// converting a string to regexp.Regexp
+			Type: "*string",
 			JSON: "pattern",
+			Deref: true,
+			Zero: `""`,
 		},
 		// ArrayValidations
 		{
@@ -263,7 +267,7 @@ func GenerateDraft04() error {
 
 	fmt.Fprintf(&buf, "package draft04")
 	fmt.Fprintf(&buf, "\n\nimport (")
-	for _, pkg := range []string{"encoding/json", "regexp"} {
+	for _, pkg := range []string{"encoding/json"} {
 		fmt.Fprintf(&buf, "\n%s", strconv.Quote(pkg))
 	}
 	fmt.Fprintf(&buf, "\n")
@@ -272,11 +276,13 @@ func GenerateDraft04() error {
 	}
 	fmt.Fprintf(&buf, "\n)") //end import
 
-	fmt.Fprintf(&buf, "\n\ntype SchemaProperties struct {")
+	WritePropertyStruct(&buf)
+
+	fmt.Fprintf(&buf, "\n\ntype schemaProperties struct {")
 	for _, prop := range schemaProperties {
 		fmt.Fprintf(&buf, "\n%s %s `json:\"%s,omitempty\"`", prop.Name, prop.Type, prop.JSON)
 	}
-	fmt.Fprintf(&buf, "\n}") // end type SchemaProperties
+	fmt.Fprintf(&buf, "\n}") // end type schemaProperties
 
 	if err := WriteGetters(&buf, schemaProperties); err != nil {
 		return errors.Wrap(err, `failed to write getters for draft04`)
@@ -287,7 +293,7 @@ func GenerateDraft04() error {
 	fmt.Fprintf(&buf, "\n}") // end MarshalJSON
 
 	fmt.Fprintf(&buf, "\n\nfunc (s *Schema) UnmarshalJSON(buf []byte) error {")
-	fmt.Fprintf(&buf, "\nvar props SchemaProperties")
+	fmt.Fprintf(&buf, "\nvar props schemaProperties")
 	fmt.Fprintf(&buf, "\nif err := json.Unmarshal(buf, &props); err != nil {")
 	fmt.Fprintf(&buf, "\nreturn errors.Wrap(err, `failed to unmarshal schema`)")
 	fmt.Fprintf(&buf, "\n}")
@@ -426,8 +432,12 @@ func GenerateDraft07() error {
 		},
 		{
 			Name: "Pattern",
-			Type: "*regexp.Regexp",
+			// we would like this to be *regexp.Regexp, but json.Unmarshal cannot handle
+			// converting a string to regexp.Regexp
+			Type: "*string",
 			JSON: "pattern",
+			Deref: true,
+			Zero: `""`,
 		},
 
 		// 6.4.  Validation Keywords for Arrays
@@ -571,7 +581,7 @@ func GenerateDraft07() error {
 
 	fmt.Fprintf(&buf, "package draft07")
 	fmt.Fprintf(&buf, "\n\nimport (")
-	for _, pkg := range []string{"bytes", "encoding/json", "regexp"} {
+	for _, pkg := range []string{"bytes", "encoding/json"} {
 		fmt.Fprintf(&buf, "\n%s", strconv.Quote(pkg))
 	}
 	fmt.Fprintf(&buf, "\n")
@@ -580,11 +590,13 @@ func GenerateDraft07() error {
 	}
 	fmt.Fprintf(&buf, "\n)") //end import
 
-	fmt.Fprintf(&buf, "\n\ntype SchemaProperties struct {")
+	WritePropertyStruct(&buf)
+
+	fmt.Fprintf(&buf, "\n\ntype schemaProperties struct {")
 	for _, prop := range schemaProperties {
 		fmt.Fprintf(&buf, "\n%s %s `json:\"%s,omitempty\"`", prop.Name, prop.Type, prop.JSON)
 	}
-	fmt.Fprintf(&buf, "\n}") // end type SchemaProperties
+	fmt.Fprintf(&buf, "\n}") // end type schemaProperties
 
 	if err := WriteGetters(&buf, schemaProperties); err != nil {
 		return errors.Wrap(err, `failed to write getters for draft07`)
@@ -765,5 +777,23 @@ func WriteGetters(dst io.Writer, properties []Property) error {
 		fmt.Fprintf(dst, "\nreturn s.properties.%s != nil", prop.Name)
 		fmt.Fprintf(dst, "\n}") // end Has%s
 	}
+
+	return nil
+}
+
+func WritePropertyStruct(dst io.Writer) error {
+	fmt.Fprintf(dst, "\n\ntype Property struct {")
+	fmt.Fprintf(dst, "\nname string")
+	fmt.Fprintf(dst, "\ndefinition *Schema")
+	fmt.Fprintf(dst, "\n}") // end Property
+
+	fmt.Fprintf(dst, "\nfunc (p *Property) Name() string {")
+	fmt.Fprintf(dst, "\nreturn p.name")
+	fmt.Fprintf(dst, "\n}") // end Name()
+
+	fmt.Fprintf(dst, "\nfunc (p *Property) Definition() *Schema {")
+	fmt.Fprintf(dst, "\nreturn p.definition")
+	fmt.Fprintf(dst, "\n}") // end Definition()
+
 	return nil
 }
